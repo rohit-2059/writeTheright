@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+    <script src="https://kit.fontawesome.com/a7f895627a.js" crossorigin="anonymous"></script>
+    <style>
+        body{
+            position: relative; /* Added */
+            background-image: url(download.png);
+            background-size: 48rem;
+            min-inline-size: 48rem;
+            background-repeat: no-repeat;
+            background-color: gainsboro;
+            animation: banda 0.7s linear;
+        }
+        @keyframes banda{
+            0%{
+                background-position-x: -100%;
+            }
+            100%{
+                background-position-x: left;
+            }
+        }
+        /* New CSS for sound icon */
+        .sound-icon {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            color: black;
+            cursor: pointer;
+            z-index: 1000; /* Ensures it's above other elements */
+            margin-right: 44.5rem;
+            margin-top: -0.5rem;
+            animation: icon 2s linear;
+        }
+        @keyframes icon{
+            0%{
+                color: transparent;
+            }
+            50%{
+                color: transparent;
+            }
+            100%{
+                color: black;
+            }
+        }
+        .type p{
+            font-family: 'Courier New', Courier, monospace;
+            font-weight: bold;
+            font-size: 2rem;
+            overflow: hidden;
+            margin-left: 34.37rem;
+            margin-top: 6.25rem;
+            margin-right: 2rem;
+            animation: text 2s linear, audioPlay 0s linear forwards;
+            text-align: justify;
+        }
+        @keyframes text{
+            0%{
+                color: transparent;
+            }
+            50%{
+                color: transparent;
+            }
+            100%{
+                color: black;
+            }
+        }
+        @keyframes audioPlay {
+            0% { 
+                animation-play-state: paused; 
+            }
+            1% {
+                animation-play-state: running;
+            }
+        }
+        .container .button{
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-top: 1.87rem;
+            margin-left: 55rem;
+            font-size: 4.5rem;
+            animation: button 6s linear;
+        }
+        .container a{
+            color: white;
+            background-color: black;
+            text-decoration: none;
+            padding: 0.62rem 1.25rem;
+            margin-right: 1.25rem;
+            border: 0.12rem solid black;
+            display: flex;
+            align-items: center;
+            animation: button 6s linear;
+        }
+        @keyframes button{
+            0%{
+                color: transparent;
+                border: none;
+                background-color: transparent;
+            }
+            50%{
+                border: black;
+                color: transparent;
+                background-color: transparent;
+            }
+            75%{
+                color: transparent;
+                border: black;
+                background-color: transparent;
+            }
+            100%{
+                color: white;
+            }
+        }
+    </style>
+</head>
+<body>
+<audio id="audio" src="bob1.mp3"></audio>
+<!-- Sound icon HTML -->
+<div class="sound-icon" id="sound-icon">
+    <i class="fas fa-volume-up fa-lg"></i>
+</div>
+<div class="container">
+    <div class="type">
+        <p class="text" id="text">Hi I'm Bob.<br><br>Welcome to WriteTheRights where learning about your rights is an exciting journey filled with adventure and discovery! In this immersive game, you will embark on a quest to explore the world of laws and rights, empowering yourself with knowledge that will help you navigate life's challenges.</p>
+    </div>
+    <div class="button">
+        <a href="bob2.html">Next<span>&#x27F6;</span></a>
+    </div>
+</div>
+<script>
+    var audio = document.getElementById('audio');
+    var soundIcon = document.getElementById('sound-icon');
+
+    soundIcon.addEventListener('click', function() {
+        if (audio.paused) {
+            audio.play();
+            soundIcon.innerHTML = '<i class="fas fa-volume-up fa-lg"></i>';
+        } else {
+            audio.pause();
+            audio.currentTime = 0;
+            soundIcon.innerHTML = '<i class="fas fa-volume-mute fa-lg"></i>';
+        }
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Introduction</title>
+    <script src="https://kit.fontawesome.com/a7f895627a.js" crossorigin="anonymous"></script>
+    <style>
+        body{
+            background-image: url(download2.png);
+            background-size: 50%;
+            background-position-x: 100%;
+            background-repeat: no-repeat;
+            background-color: gainsboro;
+            animation: banda2 0.7s linear;
+        }
+        @keyframes banda2{
+            0%{
+                background-position-x: 170%;
+            }
+            100%{
+                background-position-x: right;
+            }
+        }
+        .type p{
+            font-family: 'Courier New', Courier, monospace;
+            font-weight: bold;
+            font-size: 1.5rem;
+            overflow: hidden;
+            margin-left: 3rem;
+            margin-top: 50px;
+            margin-right: 35rem;
+            animation: text 2s linear;
+            text-align: justify;
+        }
+        @keyframes text{
+            0%{
+                color: transparent;
+            }
+            50%{
+                color: transparent;
+            }
+            100%{
+                color: black;
+            }
+        }
+        .container .button{
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-top: 4.5rem;
+            margin-left: 10rem;
+            font-size: 4.5rem;
+            animation: button 6s linear;
+        }
+        .container a{
+            color: white;
+            background-color: black;
+            text-decoration: none;
+            padding: 10px 20px;
+            margin-right: 20px;
+            border: 2px solid black;
+            display: flex;
+            align-items: center;
+            animation: button 6s linear;
+        }
+        @keyframes button{
+            0%{
+                color: transparent;
+                border: none;
+                background-color: transparent;
+            }
+            50%{
+                border: black;
+                color: transparent;
+                background-color: transparent;
+            }
+            75%{
+                color: transparent;
+                border: black;
+                background-color: transparent;
+            }
+            100%{
+                color: white;
+            }
+        }
+        .sound-icon {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            color: black;
+            cursor: pointer;
+            z-index: 1000;
+            margin-right: 92.5rem;
+            margin-top: 2.4rem;
+            animation: icon 2s linear;
+        }
+        @keyframes icon{
+            0%{
+                color: transparent;
+            }
+            50%{
+                color: transparent;
+            }
+            100%{
+                color: black;
+            }
+        }
+    </style>
+</head>
+<body>
+    <audio id="audio" src="bob2.mp3"></audio>
+<!-- Sound icon HTML -->
+<div class="sound-icon" id="sound-icon">
+    <i class="fas fa-volume-up fa-lg"></i>
+</div>
+    <div class="container">
+        <div class="type">
+            <p class="text">The objective of this game is to educate kids about their rights in a playful and engaging manner. As you navigate through the game, you'll encounter various scenarios where you'll have to make decisions based on your understanding of your rights.Choose the option that you believe best protects your rights as a child.<br>After making your decision, you'll receive feedback on whether your choice aligns with your rights. If you make the wrong decision, don't worry! Use it as an opportunity to learn and make better choices in the future.<br><br><b>Remember:</b><br>
+                Knowing your rights is empowering! By playing this game, you're taking the first step towards becoming an informed and responsible citizen.<br><br>Are you ready to embark on this educational journey? Let's play and discover the power of knowing your rights!
+
+            </p>
+        </div>
+        <div class="button">
+            <a href="display1.html">Play Now<span>&#x27F6;</span></a>
+        </div>
+    </div>
+    <script>
+        var audio = document.getElementById('audio');
+        var soundIcon = document.getElementById('sound-icon');
+    
+        soundIcon.addEventListener('click', function() {
+            if (audio.paused) {
+                audio.play();
+                soundIcon.innerHTML = '<i class="fas fa-volume-up fa-lg"></i>';
+            } else {
+                audio.pause();
+                audio.currentTime = 0;
+                soundIcon.innerHTML = '<i class="fas fa-volume-mute fa-lg"></i>';
+            }
+        });
+    </script>
+</body>
+</html>

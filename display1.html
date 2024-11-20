@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Know about rights</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-image: url(bg6.jpg);
+            background-repeat: no-repeat;
+            background-size: cover;
+        }
+        .container{
+            display: inline-block;
+        }
+        .text{
+            font-size: 5em;
+            letter-spacing: 10px;
+            font-family: monospace;
+            border-right: 5px solid;
+            width: 100%;
+            white-space: nowrap;
+            overflow: hidden;
+            animation: typing 2s steps(18),
+            cursor .4s step-end infinite alternate;
+            color: #fff;
+        }
+        @keyframes cursor{
+            50%{
+                border-color: transparent;
+            }
+        }
+        @keyframes typing{
+            from{width: 0}
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <p class="text">Know About The rights</p>
+    </div>
+
+    <script>
+        setTimeout(function() {
+            window.location.href = "level1.html";
+        }, 2500);
+    </script>
+</body>
+</html>

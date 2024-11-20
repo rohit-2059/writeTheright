@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Puzzle Game</title>
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            overflow: hidden;
+            user-select: none;
+        }
+
+        #canvas {
+            background-color: #2c343f;
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: -1;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            text-align: center;
+            color: white;
+        }
+
+        #title {
+            height: 150px;
+            width: 400px;
+        }
+
+        #board {
+            width: 360px;
+            height: 360px;
+            background-color: lightblue;
+            border: 10px solid rgb(48, 3, 3);
+            margin: 0 auto;
+            display: flex;
+            flex-wrap: wrap;
+        }
+
+        #board img {
+            width: 118px;
+            height: 118px;
+            border: 1px solid black;
+        }
+
+        .bgimg {
+            width: 50px;
+            height: 50px;
+            opacity: 0;
+        }
+
+        #message-container {
+            color: white;
+            font-size: 35px;
+            margin-top: -33.5rem;
+            font-weight: bold;
+        }
+
+        #animated-character {
+            background-image: url("bob-removebg-preview.png");
+            width: 100px;
+            height: 100px;
+            background-size: cover;
+            position: absolute;
+            top: 0;
+            right: 100%;
+            /* Initial position outside the viewport */
+            transition: right 0.5s ease-in-out;
+            /* Transition for smooth sliding */
+        }
+
+        #message-container {
+            position: relative;
+        }
+
+        #next-level-button{
+            margin-left: 39.6rem;
+            margin-top: 29rem;
+            color: white;
+            background-color: black;
+            width: 6rem;
+            height: 2rem;
+            border-radius: 10px;
+        }
+        #next-level-button:hover {
+            background-color: lightgreen;
+            color: black;
+            cursor: pointer;
+        }
+        
+    </style>
+</head>
+<body>
+    <canvas id="canvas"></canvas>
+
+    <img id="title" class="bgimg" src="Puzzle Piece Cartoon_prev_ui.png">
+    <div id="board"></div>
+    <h1>Turns: <span id="turns">0</span></h1>
+    <div id="message-container">
+        <div id="animated-character"></div>
+        <p id="message"></p>
+    </div>
+    <div class="nxt">
+        <button id="next-level-button" style="display: none;" onclick="goToNextLevel()">Click On Me!</button>
+    </div>
+
+    <audio id="drag-sound" src="swipe.mp3"></audio>
+
+    <script>
+        var c = document.getElementById("canvas");
+        var ctx = c.getContext("2d");
+
+        function resize() {
+            var box = c.getBoundingClientRect();
+            c.width = box.width;
+            c.height = box.height;
+        }
+
+        var light = {
+            x: 160,
+            y: 200
+        };
+
+        var colors = ["#f5c156", "#e6616b", "#5cd3ad"];
+
+        function drawLight() {
+            ctx.beginPath();
+            ctx.arc(light.x, light.y, 1000, 0, 2 * Math.PI);
+            var gradient = ctx.createRadialGradient(light.x, light.y, 0, light.x, light.y, 1000);
+            gradient.addColorStop(0, "#3b4654");
+            gradient.addColorStop(1, "#2c343f");
+            ctx.fillStyle = gradient;
+            ctx.fill();
+
+            ctx.beginPath();
+            ctx.arc(light.x, light.y, 20, 0, 2 * Math.PI);
+            gradient = ctx.createRadialGradient(light.x, light.y, 0, light.x, light.y, 5);
+            gradient.addColorStop(0, "#fff");
+            gradient.addColorStop(1, "#3b4654");
+            ctx.fillStyle = gradient;
+            ctx.fill();
+        }
+
+        function Box() {
+            this.half_size = Math.floor((Math.random() * 50) + 1);
+            this.x = Math.floor((Math.random() * c.width) + 1);
+            this.y = Math.floor((Math.random() * c.height) + 1);
+            this.r = Math.random() * Math.PI;
+            this.shadow_length = 2000;
+            this.color = colors[Math.floor((Math.random() * colors.length))];
+
+            this.getDots = function () {
+                var full = (Math.PI * 2) / 4;
+                var p1 = {
+                    x: this.x + this.half_size * Math.sin(this.r),
+                    y: this.y + this.half_size * Math.cos(this.r)
+                };
+                var p2 = {
+                    x: this.x + this.half_size * Math.sin(this.r + full),
+                    y: this.y + this.half_size * Math.cos(this.r + full)
+                };
+                var p3 = {
+                    x: this.x + this.half_size * Math.sin(this.r + full * 2),
+                    y: this.y + this.half_size * Math.cos(this.r + full * 2)
+                };
+                var p4 = {
+                    x: this.x + this.half_size * Math.sin(this.r + full * 3),
+                    y: this.y + this.half_size * Math.cos(this.r + full * 3)
+                };
+
+                return {
+                    p1: p1,
+                    p2: p2,
+                    p3: p3,
+                    p4: p4
+                };
+            };
+
+            this.rotate = function () {
+                var speed = (60 - this.half_size) / 20;
+                this.r += speed * 0.002;
+                this.x += speed;
+                this.y += speed;
+            };
+
+            this.draw = function () {
+                var dots = this.getDots();
+                ctx.beginPath();
+                ctx.moveTo(dots.p1.x, dots.p1.y);
+                ctx.lineTo(dots.p2.x, dots.p2.y);
+                ctx.lineTo(dots.p3.x, dots.p3.y);
+                ctx.lineTo(dots.p4.x, dots.p4.y);
+                ctx.fillStyle = this.color;
+                ctx.fill();
+
+                if (this.y - this.half_size > c.height) {
+                    this.y -= c.height + 100;
+                }
+                if (this.x - this.half_size > c.width) {
+                    this.x -= c.width + 100;
+                }
+            };
+
+            this.drawShadow = function () {
+                var dots = this.getDots();
+                var angles = [];
+                var points = [];
+
+                for (dot in dots) {
+                    var angle = Math.atan2(light.y - dots[dot].y, light.x - dots[dot].x);
+                    var endX = dots[dot].x + this.shadow_length * Math.sin(-angle - Math.PI / 2);
+                    var endY = dots[dot].y + this.shadow_length * Math.cos(-angle - Math.PI / 2);
+                    angles.push(angle);
+                    points.push({
+                        endX: endX,
+                        endY: endY,
+                        startX: dots[dot].x,
+                        startY: dots[dot].y
+                    });
+                }
+
+                for (var i = points.length - 1; i >= 0; i--) {
+                    var n = i == 3 ? 0 : i + 1;
+                    ctx.beginPath();
+                    ctx.moveTo(points[i].startX, points[i].startY);
+                    ctx.lineTo(points[n].startX, points[n].startY);
+                    ctx.lineTo(points[n].endX, points[n].endY);
+                    ctx.lineTo(points[i].endX, points[i].endY);
+                    ctx.fillStyle = "#2c343f";
+                    ctx.fill();
+                }
+            };
+        }
+
+        var boxes = [];
+
+        function draw() {
+            ctx.clearRect(0, 0, c.width, c.height);
+            drawLight();
+
+            for (var i = 0; i < boxes.length; i++) {
+                boxes[i].rotate();
+                boxes[i].drawShadow();
+            }
+            for (var i = 0; i < boxes.length; i++) {
+                collisionDetection(i);
+                boxes[i].draw();
+            }
+            requestAnimationFrame(draw);
+        }
+
+        resize();
+        draw();
+
+        while (boxes.length < 14) {
+            boxes.push(new Box());
+        }
+
+        window.onresize = resize;
+        c.onmousemove = function (e) {
+            light.x = e.offsetX == undefined ? e.layerX : e.offsetX;
+            light.y = e.offsetY == undefined ? e.layerY : e.offsetY;
+        };
+
+        function collisionDetection(b) {
+            for (var i = boxes.length - 1; i >= 0; i--) {
+                if (i != b) {
+                    var dx = (boxes[b].x + boxes[b].half_size) - (boxes[i].x + boxes[i].half_size);
+                    var dy = (boxes[b].y + boxes[b].half_size) - (boxes[i].y + boxes[i].half_size);
+                    var d = Math.sqrt(dx * dx + dy * dy);
+                    if (d < boxes[b].half_size + boxes[i].half_size) {
+                        boxes[b].half_size = boxes[b].half_size > 1 ? boxes[b].half_size -= 1 : 1;
+                        boxes[i].half_size = boxes[i].half_size > 1 ? boxes[i].half_size -= 1 : 1;
+                    }
+                }
+            }
+        }
+
+        var rows = 3;
+        var columns = 3;
+
+        var currTile;
+        var otherTile; //blank tile
+
+        var turns = 0;
+
+        var imgOrder = ["4", "2", "8", "5", "1", "6", "7", "9", "3"];
+
+        window.onload = function () {
+            for (let r = 0; r < rows; r++) {
+                for (let c = 0; c < columns; c++) {
+                    let tile = document.createElement("img");
+                    tile.id = r.toString() + "-" + c.toString();
+                    tile.src = imgOrder.shift() + ".jpg";
+
+                    tile.addEventListener("dragstart", dragStart);
+                    tile.addEventListener("dragover", dragOver);
+                    tile.addEventListener("dragenter", dragEnter);
+                    tile.addEventListener("dragleave", dragLeave);
+                    tile.addEventListener("drop", dragDrop);
+                    tile.addEventListener("dragend", dragEnd);
+
+                    document.getElementById("board").append(tile);
+                }
+            }
+        };
+
+        function dragStart() {
+            currTile = this;
+        }
+
+        function dragOver(e) {
+            e.preventDefault();
+        }
+
+        function dragEnter(e) {
+            e.preventDefault();
+        }
+
+        function dragLeave() {}
+
+        function dragDrop() {
+            otherTile = this;
+        }
+
+        function dragEnd() {
+            if (!otherTile.src.includes("3.jpg")) {
+                return;
+            }
+
+            let currCoords = currTile.id.split("-");
+            let r = parseInt(currCoords[0]);
+            let c = parseInt(currCoords[1]);
+
+            let otherCoords = otherTile.id.split("-");
+            let r2 = parseInt(otherCoords[0]);
+            let c2 = parseInt(otherCoords[1]);
+
+            let moveLeft = r == r2 && c2 == c - 1;
+            let moveRight = r == r2 && c2 == c + 1;
+            let moveUp = c == c2 && r2 == r - 1;
+            let moveDown = c == c2 && r2 == r + 1;
+
+            let isAdjacent = moveLeft || moveRight || moveUp || moveDown;
+
+            if (isAdjacent) {
+                let currImg = currTile.src;
+                let otherImg = otherTile.src;
+
+                currTile.src = otherImg;
+                otherTile.src = currImg;
+
+                turns += 1;// Play the drag sound when a puzzle piece is moved
+                    var dragSound = document.getElementById("drag-sound");
+                    dragSound.play();
+                    
+                    document.getElementById("turns").innerText = turns;
+                    checkMovesThreshold();
+                }
+            }
+        
+
+        var movesThreshold1 = 2;
+        var movesThreshold2 = 50;
+        var movesThreshold3 = 75;
+
+        function slideInCharacter() {
+            var character = document.getElementById("animated-character");
+            if (turns === movesThreshold1 || turns === movesThreshold2 || turns === movesThreshold3) {
+                character.style.right = "0"; // Slide in the character
+            }
+        }
+
+        function displayMessage(message, showNextLevelButton) {
+            var messageElement = document.getElementById("message");
+            var nextLevelButton = document.getElementById("next-level-button");
+            messageElement.innerHTML = message;
+
+            if (showNextLevelButton) {
+                nextLevelButton.style.display = "block";
+            } else {
+                nextLevelButton.style.display = "none";
+            }
+
+            slideInCharacter();
+        }
+
+        function checkMovesThreshold() {
+            if (turns === movesThreshold1) {
+                displayMessage("Great job! Keep going!");
+            } else if (turns === movesThreshold2) {
+                displayMessage("You're doing well! Keep it up!");
+            } else if (turns === movesThreshold3) {
+                displayMessage("Can't complete this level. Keep practicing!");
+            }
+
+            slideInCharacter();
+        }
+
+        function nextLevel() {
+            alert("Moving to the next level!");
+        }
+
+        function displayMotivationalMessage(message) {
+            alert(message);
+        }
+
+        function displayGameOverMessage(message) {
+            alert(message);
+        }
+
+        function goToNextLevel() {
+            window.location.href = 'next.html';
+        }
+    </script>
+</body>
+</html>

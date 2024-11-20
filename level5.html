@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Human Rights Fill-in-the-Blank Game</title>
+  <style>
+    /* Add your CSS styles here */
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-image: url(rights.jpg);
+      background-repeat: no-repeat;
+      background-size: cover;
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      user-select: none;
+    }
+    .container {
+      background-color: lightgray;
+      border-radius: 10px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+      text-align: center;
+      animation: fade-in 1s ease-out;
+    }
+    h1 {
+      color: #333;
+      font-size: 32px;
+      margin-bottom: 20px;
+    }
+    #word-display {
+      font-size: 24px;
+      margin-bottom: 20px;
+    }
+    #keyboard-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .keyboard-row {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 10px;
+    }
+    .key {
+      padding: 10px 15px;
+      font-size: 16px;
+      background-color: #007bff;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s ease, transform 0.1s ease;
+      outline: none;
+      box-shadow: 0 2px #666;
+      margin: 0 5px;
+    }
+    .key:active {
+      transform: translateY(2px);
+    }
+    .key:hover {
+      background-color: #0056b3;
+    }
+    #attempts-left {
+      color: #888;
+      font-size: 14px;
+      margin-top: 10px;
+    }
+    #hint-container {
+      margin-top: 20px;
+      font-style: italic;
+    }
+    #modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 999;
+      display: none;
+    }
+    #modal-content {
+      background-color: #fff;
+      border-radius: 10px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+      padding: 20px;
+    }
+    #try-again-button {
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #007bff;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      outline: none;
+    }
+    #try-again-button:hover {
+      background-color: #0056b3;
+    }
+    #message-container {
+      color: red;
+      font-size: 16px;
+      margin-top: 10px;
+    }
+    #next-word-button {
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #007bff;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      outline: none;
+    }
+    #next-word-button:hover {
+      background-color: #0056b3;
+    }
+    #next-level-button {
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #007bff;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      outline: none;
+      display: none; /* Initially hidden */
+    }
+    #next-level-button:hover {
+      background-color: #0056b3;
+      transform: scale(1.1); /* Add a cool hover effect */
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Human Rights Fill-in-the-Blank Game</h1>
+    <div id="word-display"></div>
+    <div id="keyboard-container"></div>
+    <button id="hint-button" onclick="showHint()">Hint</button>
+    <div id="attempts-left">Attempts left: 5</div>
+    <div id="hint-container"></div>
+    <div id="message-container"></div>
+    <button id="next-word-button" style="display:none;" onclick="moveToNextWord()">Next Word</button>
+    <a href="display6.html" style="text-decoration: none;"><button id="next-level-button" style="display:none;" onclick="goToNextLevel()">Next Level</button></a>
+  </div>
+
+  <div id="modal">
+    <div id="modal-content">
+      <p>Sorry, you've run out of attempts. The word was: <span id="modal-word"></span></p>
+      <button id="try-again-button" onclick="restartGame()">Try Again</button>
+    </div>
+  </div>
+
+  <audio id="keypress-sound" src="keyboard.mp3"></audio> <!-- Add the path to your keypress sound file -->
+  <audio id="hint-sound" src="hint.mp3"></audio> <!-- Add the path to your hint sound file -->
+  <audio id="next-level-sound" src="nextlevel.mp3"></audio> <!-- Add the path to your next level sound file -->
+  <audio id="next-word-sound" src="nextword.mp3"></audio> <!-- Add the path to your next word sound file -->
+  <audio id="try-again-sound" src="tryagain.mp3"></audio> <!-- Add the path to your try again sound file -->
+
+  <script>
+    // JavaScript code
+    var words = [
+      { word: "participation", hint: "Fundamental human right that empowers individuals to actively engage in decision-making processes within their communities and societies." },
+      { word: "health", hint: "Fundamental human right that ensures access to medical care and well-being for all individuals, regardless of their circumstances." },
+      { word: "privacy", hint: "Fundamental human right that protects individuals from unwarranted intrusion into their personal lives and affairs." },
+      { word: "nationality", hint: "Fundamental human right that affirms an individual's belonging to a particular country, ensuring recognition and protection under the law." },
+      { word: "thought", hint: "Fundamental human right that safeguards an individual's freedom to form beliefs, opinions, and ideas without interference or coercion." },
+      { word: "education", hint: "Fundamental human right that empowers individuals with knowledge, skills, and opportunities for personal development and societal progress." }
+    ];
+    var currentWordIndex = 0; // Initialize the current word index
+    var chosenWord = words[currentWordIndex].word;
+    var hint = words[currentWordIndex].hint;
+    var visibleLetters = Math.floor(chosenWord.length / 2); // Number of visible letters
+    var indices = [];
+    while (indices.length < visibleLetters) {
+        var index = Math.floor(Math.random() * chosenWord.length);
+        if (!indices.includes(index)) {
+            indices.push(index);
+        }
+    }
+    var blanks = "right to ";
+    for (var i = 0; i < chosenWord.length; i++) {
+        if (indices.includes(i)) {
+            blanks += chosenWord[i];
+        } else {
+            blanks += "_";
+        }
+    }
+    var attempts = 5;
+    var guessedLetters = [];
+
+    var wordDisplay = document.getElementById("word-display");
+    var keyboardContainer = document.getElementById("keyboard-container");
+    var attemptsLeft = document.getElementById("attempts-left");
+    var hintContainer = document.getElementById("hint-container");
+    var modal = document.getElementById("modal");
+    var modalWord = document.getElementById("modal-word");
+    var nextWordButton = document.getElementById("next-word-button");
+    var nextLevelButton = document.getElementById("next-level-button");
+    var messageContainer = document.getElementById("message-container");
+
+    function displayWord() {
+      wordDisplay.textContent = blanks;
+    }
+
+    function checkLetter(letter) {
+      document.getElementById("keypress-sound").play(); // Play the keypress sound
+      if (guessedLetters.includes(letter)) {
+        messageContainer.textContent = "You've already guessed that letter!";
+      } else if (chosenWord.includes(letter)) {
+        guessedLetters.push(letter);
+        var newBlanks = "right to ";
+        for (var i = 0; i < chosenWord.length; i++) {
+          if (chosenWord[i] === letter) {
+            newBlanks += letter;
+          } else {
+            newBlanks += blanks[i + 9];
+          }
+        }
+        blanks = newBlanks;
+        displayWord();
+        if (!blanks.includes("_")) {
+          if (currentWordIndex < words.length - 1) { // If there are more words to guess
+            nextWordButton.style.display = "inline"; // Show the next word button
+            messageContainer.textContent = ""; // Clear any previous messages
+            hintContainer.textContent = ""; // Clear the hint for the next word
+          } else { // If all words have been guessed
+            showNextLevelButton(); // Show the next level button
+          }
+        }
+      } else {
+        attempts--;
+        attemptsLeft.textContent = "Attempts left: " + attempts;
+        if (attempts === 0) {
+          showModal();
+        } else {
+          messageContainer.textContent = "Incorrect! Try again.";
+        }
+      }
+    }
+
+    function showHint() {
+      document.getElementById("hint-sound").play(); // Play the hint sound
+      hintContainer.textContent = "Hint: " + hint;
+    }
+
+    function showModal() {
+      modalWord.textContent = chosenWord;
+      modal.style.display = "flex";
+    }
+
+    function restartGame() {
+      document.getElementById("try-again-sound").play(); // Play the try again sound
+      window.location.reload();
+    }
+
+    function moveToNextWord() {
+      currentWordIndex++; // Move to the next word
+      document.getElementById("next-word-sound").play(); // Play the next word sound
+      if (currentWordIndex < words.length) {
+        chosenWord = words[currentWordIndex].word;
+        hint = words[currentWordIndex].hint;
+        visibleLetters = Math.floor(chosenWord.length / 2); // Update the number of visible letters
+        indices = [];
+        while (indices.length < visibleLetters) {
+            var index = Math.floor(Math.random() * chosenWord.length);
+            if (!indices.includes(index)) {
+                indices.push(index);
+            }
+        }
+        blanks = "right to ";
+        for (var i = 0; i < chosenWord.length; i++) {
+            if (indices.includes(i)) {
+                blanks += chosenWord[i];
+            } else {
+                blanks += "_";
+            }
+        }
+        guessedLetters = [];
+        attempts = 5;
+        displayWord();
+        nextWordButton.style.display = "none"; // Hide the next word button again
+        messageContainer.textContent = ""; // Clear any previous messages
+        hintContainer.textContent = ""; // Clear the hint for the next word
+      } else {
+        showNextLevelButton(); // If all words have been guessed, show the next level button
+      }
+    }
+
+    function showNextLevelButton() {
+      nextLevelButton.style.display = "inline";
+    }
+
+    function goToNextLevel() {
+      document.getElementById("next-level-sound").play(); // Play the next level sound
+      window.location.href = "home.html"; // Replace "home.html" with the URL of your next level or home page
+    }
+
+    // Generate keyboard buttons
+    var qwertyLayout = [
+      "qwertyuiop",
+      "asdfghjkl",
+      "zxcvbnm"
+    ];
+
+    for (var i = 0; i < qwertyLayout.length; i++) {
+      var row = qwertyLayout[i];
+      var rowElement = document.createElement("div");
+      rowElement.className = "keyboard-row";
+      for (var j = 0; j < row.length; j++) {
+        var letter = row[j];
+        var button = document.createElement("button");
+        button.textContent = letter;
+        button.className = "key";
+        button.onclick = function() {
+          checkLetter(this.textContent);
+          this.classList.add("pressed");
+          setTimeout(() => {
+            this.classList.remove("pressed");
+          }, 100);
+        };
+        rowElement.appendChild(button);
+      }
+      keyboardContainer.appendChild(rowElement);
+    }
+
+    document.getElementById("try-again-button").addEventListener('click', restartGame); // Attach event listener to try again button
+    document.getElementById("hint-button").addEventListener('click', showHint); // Attach event listener to hint button
+    nextWordButton.addEventListener('click', moveToNextWord); // Attach event listener to next word button
+    nextLevelButton.addEventListener('click', goToNextLevel); // Attach event listener to next level button
+
+    displayWord();
+  </script>
+</body>
+</html>

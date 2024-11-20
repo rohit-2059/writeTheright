@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Human Rights Decision-Making Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-image: url(think.jpg);
+            background-repeat: no-repeat;
+            background-size: cover;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            user-select: none;
+        }
+
+        .container {
+            max-width: 600px;
+            text-align: center;
+            padding: 20px;
+            background-color: lightgray;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            animation: fadeIn 0.5s ease-in-out;
+            margin-left: 25rem;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        h1 {
+            color: #333;
+            margin-top: 0;
+        }
+
+        #scenario {
+            margin: 20px 0;
+            padding: 20px;
+            background-color: #f1f1f1;
+            border-radius: 10px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+        }
+
+        #choices button {
+            margin: 10px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            background-color: black;
+            color: #fff;
+            transition: background-color 0.3s, transform 0.3s ease-in-out;
+        }
+
+        #choices button:hover {
+            background-color: #0056b3;
+            transform: scale(1.1);
+        }
+
+        #feedback {
+            margin-top: 20px;
+            font-weight: bold;
+            color: #dc3545;
+            transition: opacity 0.5s ease-in-out;
+        }
+
+        #score {
+            margin-top: 20px;
+            font-size: 18px;
+            color: #28a745;
+            transition: color 0.5s ease-in-out;
+        }
+
+        #score-value {
+            font-weight: bold;
+        }
+
+        #question-number {
+            font-size: 16px;
+            color: #333;
+        }
+
+        #restart, #next-level {
+            margin-top: 20px;
+            display: none;
+            background-color: #28a745;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        #restart:hover, #next-level:hover {
+            background-color: #218838;
+        }
+
+        #note {
+            font-size: 14px;
+            color: #333;
+            margin-top: 20px;
+            opacity: 0.8;
+        }
+
+        #note:hover {
+            opacity: 1;
+        }
+
+        #timer {
+            font-size: 16px;
+            color: #333;
+            margin-top: 20px;
+        }
+
+        #time-left {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Human Rights Decision-Making Game</h1>
+        <div id="question-number">0/5</div>
+        <div id="note">Note: Make your score 10 to go to the next level.</div>
+        <div id="scenario"></div>
+        <div id="choices"></div>
+        <div id="feedback"></div>
+        <div id="score">Score: <span id="score-value">0</span></div>
+        <div id="timer">Time Left: <span id="time-left">1:30</span></div>
+        <button id="restart" onclick="restartGame()">Restart</button>
+        <a href="display7.html" style="text-decoration: none;"><button id="next-level" onclick="nextLevel()">Next Level</button></a>
+        <audio id="clickSound" src="selectoption2.mp3"></audio> <!-- Add your click sound file here -->
+        <audio id="restartSound" src="next.mp3"></audio> <!-- Add your restart sound file here -->
+        <audio id="nextLevelSound" src="nextlevel.mp3"></audio> <!-- Add your next level sound file here -->
+    </div>
+
+    <script>
+        let timerInterval;
+        let timeLeft = 90; // 40 seconds
+        let allScenarios = [
+            // Your scenarios here
+            {
+                text: "You witness a peaceful protest in your city. The government has declared it illegal. What do you do?",
+                options: [
+                    "Report the protest to the authorities.",
+                    "Join the protest to show support.",
+                    "Ignore the protest and go about your day."
+                ],
+                correctOption: 1
+            },
+            {
+                text: "You see a group of students being bullied because of their ethnicity. What action do you take?",
+                options: [
+                    "Inform a teacher or authority figure about the situation.",
+                    "Confront the bullies and defend the students.",
+                    "Walk away and pretend not to notice."
+                ],
+                correctOption: 0
+            },
+            {
+                text: "Your friend is being discriminated against because of their gender identity. How do you respond?",
+                options: [
+                    "Avoid your friend to not be associated with them.",
+                    "Stay neutral and not get involved.",
+                    "Speak up against the discrimination and support your friend."
+                ],
+                correctOption: 2
+            },
+            {
+                text: "You find out that your workplace pays men and women differently for the same job. What do you do?",
+                options: [
+                    "Raise the issue with your employer and demand equal pay for all.",
+                    "Accept the situation and don't say anything.",
+                    "Quit your job and find another one."
+                ],
+                correctOption: 0
+            },
+            {
+                text: "You discover that a local business is employing underage children in unsafe conditions. How do you react?",
+                options: [
+                    "Mind your own business and do nothing.",
+                    "Boycott the business but keep it to yourself.",
+                    "Report the business to the authorities and advocate for the children's rights."
+                ],
+                correctOption: 2
+            }
+        ];
+        let scenarios = allScenarios.slice(0, 5);
+        let currentScenarioIndex = 0;
+        let score = 0;
+
+        function initGame() {
+            displayScenario();
+            startTimer();
+        }
+
+        function startTimer() {
+            timerInterval = setInterval(updateTimer, 1000); // Update timer every second
+        }
+
+        function updateTimer() {
+            const timerDisplay = document.getElementById("time-left");
+            timeLeft--;
+            if (timeLeft >= 0) {
+                const minutes = Math.floor(timeLeft / 60);
+                const seconds = timeLeft % 60;
+                timerDisplay.textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+            } else {
+                clearInterval(timerInterval);
+                hideOptions();
+                endGame();
+            }
+        }
+
+        function displayScenario() {
+            const scenarioContainer = document.getElementById("scenario");
+            scenarioContainer.textContent = scenarios[currentScenarioIndex].text;
+
+            const choicesContainer = document.getElementById("choices");
+            choicesContainer.innerHTML = "";
+            scenarios[currentScenarioIndex].options.forEach((option, index) => {
+                const button = document.createElement("button");
+                button.textContent = option;
+                button.onclick = () => {
+                    chooseOption(index);
+                    playClickSound(); // Call function to play sound
+                };
+                choicesContainer.appendChild(button);
+            });
+
+            updateQuestionNumber();
+        }
+
+        function playClickSound() {
+            const clickSound = document.getElementById("clickSound");
+            clickSound.play();
+        }
+
+        function chooseOption(optionIndex) {
+            const correctOptionIndex = scenarios[currentScenarioIndex].correctOption;
+            if (optionIndex === correctOptionIndex) {
+                displayFeedback("Correct! Your decision aligns with human rights principles.", true);
+                score += 2;
+            } else {
+                displayFeedback("Incorrect. The correct answer is: " + scenarios[currentScenarioIndex].options[correctOptionIndex], false);
+            }
+
+            updateScore();
+            currentScenarioIndex++;
+            if (currentScenarioIndex < 5) {
+                displayScenario();
+            } else {
+                endGame();
+            }
+        }
+
+        function displayFeedback(message, isCorrect) {
+            const feedbackContainer = document.getElementById("feedback");
+            feedbackContainer.textContent = message;
+            feedbackContainer.style.color = isCorrect ? "#28a745" : "#dc3545";
+            feedbackContainer.style.opacity = "1";
+        }
+
+        function updateScore() {
+            const scoreContainer = document.getElementById("score-value");
+            scoreContainer.textContent = score;
+        }
+
+        function endGame() {
+            const finalMessage = score >= 10 ? "Congratulations! You have won the game." : "Game over. You did not earn enough points to win.";
+            const feedbackContainer = document.getElementById("feedback");
+            feedbackContainer.textContent = finalMessage;
+            feedbackContainer.style.color = score >= 10 ? "#28a745" : "#dc3545";
+            feedbackContainer.style.opacity = "1";
+
+            clearInterval(timerInterval);
+            if (score < 10) {
+                document.getElementById("restart").style.display = "block";
+            } else {
+                document.getElementById("next-level").style.display = "block";
+            }
+        }
+
+        function restartGame() {
+            playRestartSound(); // Play sound when restart button is clicked
+            currentScenarioIndex = 0;
+            score = 0;
+            timeLeft = 90; // Reset timer to 40 seconds
+            displayScenario();
+            document.getElementById("restart").style.display = "none";
+            document.getElementById("next-level").style.display = "none";
+            document.getElementById("feedback").textContent = "";
+            document.getElementById("score-value").textContent = "0";
+            document.getElementById("time-left").textContent = "1:30";
+            startTimer();
+        }
+
+        function playRestartSound() {
+            const restartSound = document.getElementById("restartSound");
+            restartSound.play();
+        }
+
+        function hideOptions() {
+            const choicesContainer = document.getElementById("choices");
+            choicesContainer.innerHTML = "";
+        }
+
+        function updateQuestionNumber() {
+            const questionNumberContainer = document.getElementById("question-number");
+            questionNumberContainer.textContent = (currentScenarioIndex + 1) + "/5";
+        }
+
+        function nextLevel() {
+            playNextLevelSound(); // Play sound when next level button is clicked
+            // Your next level logic here
+        }
+
+        function playNextLevelSound() {
+            const nextLevelSound = document.getElementById("nextLevelSound");
+            nextLevelSound.play();
+        }
+
+        initGame();
+    </script>
+</body>
+</html>

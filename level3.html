@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Word Scramble Game</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #333;
+      color: #fff;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+    }
+    #container {
+      margin: 50px auto;
+      text-align: center;
+      background-color: #444;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      padding: 30px;
+      max-width: 90%;
+      width: 40%;
+      margin-top: 11rem;
+    }
+    h1 {
+      color: #fff;
+    }
+    #game-box {
+      border: 2px solid #fff;
+      padding: 20px;
+      margin-top: 20px;
+      border-radius: 10px;
+      background-color: #555;
+    }
+    #scrambled-word {
+      font-size: 24px;
+      margin-bottom: 20px;
+      color: #007bff;
+    }
+    #answer-input {
+      padding: 10px;
+      margin-bottom: 10px;
+      border-radius: 5px;
+      border: 1px solid #007bff;
+      width: 60%;
+      font-size: 16px;
+      color: #333;
+    }
+    #submit-btn {
+      padding: 10px 20px;
+      background-color: #007bff;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      border-radius: 5px;
+      transition: background-color 0.3s ease;
+    }
+    #submit-btn:hover {
+      background-color: #0056b3;
+    }
+    #result {
+      font-size: 18px;
+      margin-top: 10px;
+      color: red;
+    }
+    #next-level-btn {
+      display: none;
+      padding: 10px 20px;
+      background-color: black;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      border-radius: 5px;
+      transition: background-color 0.3s ease;
+      font-size: 1.5rem;
+      margin-left: 42rem;
+    }
+    #next-level-btn:hover {
+      background-color: #218838;
+    }
+    body {
+      background-image: url(words.jpg);
+      background-repeat: no-repeat;
+      background-size: cover;
+    }
+    @media (max-width: 768px) {
+      #container {
+        margin: 20px auto;
+      }
+      #answer-input {
+        width: 80%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="container">
+    <h1>Word Scramble Game</h1>
+    <h3>"Guess all the 5 words correctly!"</h3>
+    <div id="game-box">
+      <div id="scrambled-word"></div>
+      <input type="text" id="answer-input" placeholder="Enter your answer">
+      <button id="submit-btn">Submit</button>
+      <div id="result"></div>
+    </div>
+  </div>
+  <a href="display4.html" style="text-decoration: none;"><button id="next-level-btn">Next Level</button></a>
+  
+  <!-- Add audio elements for the sound effects -->
+  <audio id="submit-sound">
+    <source src="submit.mp3" type="audio/mpeg">
+    Your browser does not support the audio element.
+  </audio>
+
+  <audio id="next-level-sound">
+    <source src="nextlevel.mp3" type="audio/mpeg">
+    Your browser does not support the audio element.
+  </audio>
+
+  <script>
+    const words = [
+      { scrambled: "htleah", correct: "health" },
+      { scrambled: "ypal", correct: "play" },
+      { scrambled: "dcaetniou", correct: "education" },
+      { scrambled: "feredmo", correct: "freedom" },
+      { scrambled: "pxsrenseio", correct: "expression" }
+    ];
+
+    let currentWordIndex = 0;
+
+    const scrambledWordElement = document.getElementById('scrambled-word');
+    const answerInputElement = document.getElementById('answer-input');
+    const submitButton = document.getElementById('submit-btn');
+    const resultElement = document.getElementById('result');
+    const nextLevelButton = document.getElementById('next-level-btn');
+
+    function displayNextWord() {
+      if (currentWordIndex < words.length) {
+        const currentWord = words[currentWordIndex];
+        scrambledWordElement.textContent = `"Right to [${currentWord.scrambled}]"`;
+        answerInputElement.value = '';
+        resultElement.textContent = '';
+      } else {
+        resultElement.textContent = `Congrats! You completed the level.`;
+        resultElement.style.color = 'lightgreen';
+        nextLevelButton.style.display = 'block';
+      }
+    }
+
+    submitButton.addEventListener('click', function() {
+      // Play the submit sound
+      document.getElementById('submit-sound').play();
+
+      const userAnswer = answerInputElement.value.trim().toLowerCase();
+      const currentWord = words[currentWordIndex];
+
+      if (userAnswer === currentWord.correct) {
+        resultElement.textContent = 'Correct!';
+        resultElement.style.color = 'red';
+      } else {
+        resultElement.textContent = 'Try again!';
+        resultElement.style.color = 'red';
+        return;
+      }
+
+      currentWordIndex++;
+      displayNextWord();
+
+      if (currentWordIndex === words.length) {
+        nextLevelButton.style.display = 'block';
+      }
+    });
+
+    nextLevelButton.addEventListener('click', function() {
+      // Play the next level sound
+      document.getElementById('next-level-sound').play();
+
+      currentWordIndex = 0;
+      nextLevelButton.style.display = 'none';
+      displayNextWord();
+    });
+
+    displayNextWord();
+  </script>
+</body>
+</html>

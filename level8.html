@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            background: linear-gradient(135deg, #3494e6, #ec6ead);
+        }
+
+        #quiz-container {
+            max-width: 600px;
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+            animation: fadeIn 1s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .question {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            animation: slideInUp 1s ease;
+        }
+
+        @keyframes slideInUp {
+            from {
+                transform: translateY(-20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .options-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            animation: fadeInUp 1s ease;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .option {
+            cursor: pointer;
+            margin: 10px;
+            padding: 15px;
+            width: 200px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+            animation: fadeIn 1s ease;
+        }
+
+        .option:hover {
+            background-color: #eee;
+        }
+
+        #result {
+            font-size: 1.5rem;
+            margin-top: 20px;
+            animation: fadeInUp 1s ease;
+        }
+
+        button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 1rem;
+            background-color: #4CAF50;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            animation: fadeIn 1s ease;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+    <title>Human Rights Quiz</title>
+</head>
+<body>
+
+<div id="quiz-container">
+    <div class="question" id="question"></div>
+    <div class="options-container" id="options"></div>
+    <div id="result"></div>
+    <button onclick="nextQuestion()">Next Question</button>
+</div>
+
+
+<script>
+    const questions = [
+        {
+            question: "What is the name of an agreement between countries to share the same law?",
+            options: ["Convenience", "Conversion", "Invention", "Convention"],
+            correctAnswer: "Convention"
+        },
+        {
+            question: "What does the right to freedom of expression protect?",
+            options: ["Right to vote", "Right to express political opinions", "Right to own property", "Right to education"],
+            correctAnswer: "Right to express political opinions"
+        },
+        {
+            question: "Which human right is focused on the prohibition of torture and inhuman or degrading treatment?",
+            options: ["Right to education", "Right to a fair trial", "Right to be free from torture", "Right to privacy"],
+            correctAnswer: "Right to be free from torture"
+        },
+        {
+            question: "Which organisation set the standard for Human Rights around the world?",
+            options: ["Unicef","United Nations","English Heritage","Greenpeace"],
+            correctAnswer: "United Nations"
+        },
+        {
+            question: "Up to what age does the Children’s Rights apply?",
+            options: ["16","17","18","21"],
+            correctAnswer: "18"
+        },
+        {
+            question: "Which situation has broken someone’s right?",
+            options: ["A young girl is not allowed to have a new dress","A little boy is sent to bed early for misbehaving","A year 6 boy is not allowed to go to the swimming baths","A country's government does not allow girls to go to school"],
+            correctAnswer: "A country's government does not allow girls to go to school"
+        },
+        {
+            question: " Which group of children are excluded from having rights?",
+            options: ["Naughty children","Children with blue eyes","All children have rights","Year 6 children"],
+            correctAnswer:"All childern have rights"
+        },
+        {
+            question: "Which is not a right?",
+            options: ["To have food and water","To have freedom","To have an education","To have new trainers"],
+            correctAnswer: "To have new trainers"
+        },
+        {
+            question: "‘With rights comes responsibility’. What does this mean?",
+            options: ["We have to pay for our rights","If we aren’t responsible we lose our rights","Only responsible people have rights","We have to respect the rights of others"],
+            correctAnswer: "We have to respect the rights of others"
+        },
+        {
+            question: "Which of these is NOT a need?",
+            options: ["Food","Shelter","Computer","Water"],
+            correctAnswer:"Computer"
+        }
+    ];
+
+    let currentQuestion = 0;
+    let score = 0;
+
+    function loadQuestion() {
+        const questionElement = document.getElementById('question');
+        const optionsElement = document.getElementById('options');
+        const resultElement = document.getElementById('result');
+
+        questionElement.textContent = questions[currentQuestion].question;
+        optionsElement.innerHTML = '';
+
+        questions[currentQuestion].options.forEach((option, index) => {
+            const optionElement = document.createElement('div');
+            optionElement.classList.add('option');
+            optionElement.textContent = option;
+            optionElement.onclick = () => checkAnswer(option);
+            optionsElement.appendChild(optionElement);
+        });
+
+        resultElement.textContent = '';
+    }
+
+    function checkAnswer(selectedAnswer) {
+        const correctAnswer = questions[currentQuestion].correctAnswer;
+        if (selectedAnswer === correctAnswer) {
+            score++;
+        }
+        document.getElementById('result').textContent = `Your current score: ${score}`;
+    }
+
+    function nextQuestion() {
+        if (currentQuestion < questions.length - 1) {
+            currentQuestion++;
+            loadQuestion();
+        } else {
+            document.getElementById('result').textContent = `Quiz completed! Your final score is ${score} out of ${questions.length}.`;
+        }
+    }
+
+    // Initial load
+    loadQuestion();
+</script>
+
+</body>
+</html>

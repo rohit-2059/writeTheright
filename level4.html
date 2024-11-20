@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rights Riddles Game</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: 'Arial', sans-serif;
+            background-image: url(riddle.png);
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: 25rem;
+            background-color: rgb(205, 149, 52);
+            user-select: none;
+        }
+        
+        #game-container {
+            text-align: center;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            max-width: 600px;
+            width: 100%;
+            animation: slideIn 0.5s forwards;
+            margin-right: 30rem;
+            background-image: linear-gradient(rgb(238, 182, 85),rgb(238, 182, 85), black);
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        #question-number {
+            margin-top: 1rem;
+            font-size: 16px;
+            color: black;
+        }
+        
+        #question-container {
+            margin-bottom: 20px;
+            font-size: 24px;
+            color: black;
+            font-weight: bold;
+        }
+        
+        #options-container {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .options-group {
+            width: 48%;
+        }
+        
+        .option {
+            display: block;
+            margin-bottom: 10px;
+            padding: 15px;
+            border: 2px solid transparent;
+            border-radius: 5px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+        
+        .option:hover {
+            background-color: black;
+            color: #fff;
+            border-color: black;
+        }
+        
+        button {
+            margin-top: 1rem;
+            padding: 10px 20px;
+            border: none;
+            background-color: #3498db;
+            color: #fff;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: #2980b9;
+        }
+        
+        #result-container {
+            font-weight: bold;
+            font-size: 18px;
+            margin-top: 1rem;
+            animation: fadeIn 0.5s forwards;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+        
+        /* Game Winning Screen Styling */
+        .game-winning-screen {
+            display: none;
+            background: rgba(0, 0, 0, 0.8);
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            justify-content: center;
+            align-items: center;
+            z-index: 2;
+        }
+        
+        .game-winning-content {
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            animation: fadeIn 0.5s forwards;
+        }
+        
+        #next-level-button {
+            margin-top: 10px;
+            padding: 10px 20px;
+            background-color: #3498db;
+            color: #fff;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+        
+        #next-level-button:hover {
+            background-color: #2980b9;
+        }
+        
+        .try-again-screen {
+            display: none;
+            background: rgba(41, 35, 35, 0.8);
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            justify-content: center;
+            align-items: center;
+            z-index: 2;
+        }
+        
+        .try-again-content {
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            animation: fadeIn 0.5s forwards;
+        }
+        
+        #try-again-button {
+            margin-top: 10px;
+            padding: 10px 20px;
+            background-color: rgb(27, 25, 25);
+            color: #fff;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+        
+        #try-again-button:hover {
+            background-color: #c0392b;
+        }
+        .heading{
+            position: absolute;
+            margin-top: -30rem;
+            margin-right: 29rem;
+            font-size: 46px;
+            animation: heading 0.7s linear;
+        }
+        @keyframes heading{
+            0%{
+                color: transparent;
+            }
+            100%{
+                color: black;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1 class="heading">Rights Riddle</h1>
+<div id="game-container">
+    <div id="question-number">Question <span id="current-question-number">1</span> of 5</div>
+    <div id="question-container">
+        <p id="question"></p>
+    </div>
+    <div id="options-container" class="options-container">
+        <div class="options-group" id="options-left"></div>
+        <div class="options-group" id="options-right"></div>
+    </div>
+    <div id="result-container"></div>
+</div>
+
+<div id="game-winning-screen" class="game-winning-screen">
+    <div class="game-winning-content">
+        <p>Congratulations! You've completed the game.</p>
+        <a href="display5.html"><button id="next-level-button" onclick="nextLevel()">Next Level</button></a>
+    </div>
+</div>
+<!-- try again -->
+<div id="try-again-screen" class="try-again-screen">
+    <div class="try-again-content">
+        <p>Sorry! You've reached the maximum wrong attempts. Please try again.</p>
+        <button id="try-again-button" onclick="tryAgain()">Try Again</button>
+    </div>
+</div>
+
+<audio id="click-sound" src="selectoption.mp3"></audio>
+<audio id="try-again-sound" src="tryagain.mp3"></audio> <!-- Add try again sound -->
+<audio id="next-level-sound" src="next.mp3"></audio> <!-- Add next level sound -->
+
+<script>
+    const riddlesWithOptions = [
+        {
+            question: "I am the freedom to express, without fear or distress. What am I?",
+            options: ["Freedom of Speech", "Right to Privacy", "Right to Education", "Right to Life"],
+            answer: "Freedom of Speech"
+        },
+        {
+            question: "I keep you safe from harm, no matter your background or charm. What am I?",
+            options: ["Right to Privacy", "Right to Life and Security", "Right to a Fair Trial", "Right to Health"],
+            answer: "Right to Life and Security"
+        },
+        {
+            question: "I'm the fairness that all deserve, in every country, the right to observe. What am I?",
+            options: ["Right to Education", "Right to a Fair Trial", "Freedom of Speech", "Right to Life"],
+            answer: "Right to a Fair Trial"
+        },
+        {
+            question: "I'm the choice to learn and know, in schools and libraries, I grow. What am I?",
+            options: ["Right to Privacy", "Freedom of Speech", "Right to Education", "Right to Health"],
+            answer: "Right to Education"
+        },
+        {
+            question: "I'm the care for health and more, access to doctors and medicine galore. What am I?",
+            options: ["Right to Life and Security", "Right to Health", "Right to a Fair Trial", "Freedom of Speech"],
+            answer: "Right to Health"
+        }
+    ];
+
+    let currentQuestionIndex = 0;
+    let wrongAttempts = 0;
+    const maxWrongAttempts = 4;
+
+    function displayQuestion() {
+        const questionElement = document.getElementById("question");
+        const optionsContainerLeft = document.getElementById("options-left");
+        const optionsContainerRight = document.getElementById("options-right");
+        const currentQuestionNumberElement = document.getElementById("current-question-number");
+
+        questionElement.textContent = riddlesWithOptions[currentQuestionIndex].question;
+        currentQuestionNumberElement.textContent = currentQuestionIndex + 1;
+
+        optionsContainerLeft.innerHTML = "";
+        optionsContainerRight.innerHTML = "";
+
+        riddlesWithOptions[currentQuestionIndex].options.forEach((option, index) => {
+            const optionElement = document.createElement("div");
+            optionElement.classList.add("option");
+            optionElement.textContent = option;
+            optionElement.addEventListener("click", () => handleOptionClick(option));
+
+            if (index < 2) {
+                optionsContainerLeft.appendChild(optionElement);
+            } else {
+                optionsContainerRight.appendChild(optionElement);
+            }
+        });
+    }
+
+    function tryAgain() {
+        // Play try again sound
+        document.getElementById("try-again-sound").play();
+
+        currentQuestionIndex = 0;
+        wrongAttempts = 0;
+        displayQuestion();
+        document.getElementById("try-again-screen").style.display = "none";
+    }
+
+    function handleOptionClick(selectedOption) {
+        const resultContainer = document.getElementById("result-container");
+        const correctAnswer = riddlesWithOptions[currentQuestionIndex].answer;
+
+        const isCorrect = selectedOption === correctAnswer;
+
+        // Play click sound
+        document.getElementById("click-sound").play();
+
+        if (isCorrect) {
+            resultContainer.textContent = "Correct! Well done.";
+            resultContainer.style.color = "green";
+            currentQuestionIndex++;
+
+            if (currentQuestionIndex < riddlesWithOptions.length) {
+                setTimeout(() => {
+                    resultContainer.textContent = "";
+                    displayQuestion();
+                }, 1500);
+            } else {
+                document.getElementById("game-winning-screen").style.display = "flex";
+            }
+        } else {
+            wrongAttempts++;
+
+            if (wrongAttempts >= maxWrongAttempts) {
+                // Play try again sound
+                document.getElementById("try-again-sound").play();
+                document.getElementById("try-again-screen").style.display = "flex";
+            } else {
+                resultContainer.textContent = `Incorrect. You have ${maxWrongAttempts - wrongAttempts} attempts left.`;
+                resultContainer.style.color = "red";
+            }
+        }
+    }
+
+    function nextLevel() {
+        // Play next level sound
+        document.getElementById("next-level-sound").play();
+
+        currentQuestionIndex = 0;
+        wrongAttempts = 0;
+        displayQuestion();
+        document.getElementById("game-winning-screen").style.display = "none";
+    }
+
+    displayQuestion();
+</script>
+
+</body>
+</html>

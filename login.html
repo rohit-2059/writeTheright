@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css?family=Hind&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "hind", sans-serif;
+            text-decoration: none;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 2s ease-in-out;
+            background-image: linear-gradient(black, purple);
+        }
+
+        .bgimage {
+            position: absolute;
+            margin-left: -38.5rem;
+            margin-top: -8rem;
+        }
+
+
+        .login-form {
+            width: 470px;
+            background-image: linear-gradient(purple, black);
+            padding: 30px 60px;
+            border-radius: 1rem;
+        }
+
+
+
+        .login-form h6 {
+            color: #f1f1f1;
+            font-size: 15px;
+            text-transform: uppercase;
+            font-weight: 500;
+        }
+
+        .login-form h1 {
+            color: #f1f1f1;
+            text-align: center;
+        }
+
+        .textbox {
+            width: 100%;
+            height: 50px;
+            position: relative;
+            margin-top: 15px;
+
+        }
+
+        .textbox input {
+            width: 100%;
+            height: 50px;
+            border: none;
+            background: white;
+            padding: 0 15px;
+            font-size: 16px;
+            outline: none;
+            color: black;
+            border-radius: 4px;
+        }
+
+        .textbox input:focus {
+            background: white !important;
+        }
+
+        .check-message {
+            position: absolute;
+            top: 50%;
+            right: 10px;
+            color: #fff;
+            text-transform: uppercase;
+            transform: translateY(-50%);
+        }
+
+        .textbox input:focus+.check-message {
+            display: none;
+        }
+
+        .options {
+            margin-top: 15px;
+            color: white;
+            overflow: hidden;
+            font-size: 14px;
+        }
+
+        .options a {
+            text-decoration: underline;
+            color: white;
+            opacity: 1;
+        }
+
+        .remember-me {
+            float: left;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .checkbox {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            background: #484848;
+            margin-right: 15px;
+            position: relative;
+        }
+
+        .checkbox input {
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        .checked {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 5px;
+            height: 10px;
+            border: solid #fff;
+            border-width: 0 1px 1px 0;
+            transform: rotate(45deg);
+            display: none;
+        }
+
+        .checkbox input:checked+.checked {
+            display: block;
+        }
+
+        .options a {
+            color: #f4f4f480;
+            font-size: 14px;
+            float: right;
+        }
+
+        .login-btn {
+            width: 100%;
+            height: 50px;
+            margin-top: 30px;
+            background: #191919;
+            border: none;
+            outline: none;
+            cursor: pointer;
+            text-transform: uppercase;
+            font-weight: 700;
+            transition: .3s linear;
+        }
+
+        .login-btn.active {
+            background: #037bee;
+            color: #fff;
+        }
+
+        .login-btn.active:hover {
+            opacity: .7;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .privacy-link {
+            text-align: center;
+            margin-top: 35px;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .privacy-link a {
+            color: #f1f1f1;
+            font-size: 14px;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .dont-have-account {
+            font-size: 14px;
+            text-align: center;
+            color: #f4f4f480;
+            margin: 20px 0;
+        }
+
+        .dont-have-account a {
+            color: #f1f1f1;
+        }
+
+        @mediascreen and (max-width:470px) {
+            body {
+                background: #202020;
+            }
+
+            .login-form {
+                width: 100%;
+                padding: 0 15px;
+            }
+        }
+
+        .bubble img {
+            width: 50px;
+            animation: bubble 7s linear infinite;
+        }
+
+        .bubble {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            position: absolute;
+            bottom: -20px;
+        }
+
+        @keyframes bubble {
+            0% {
+                transform: translateY(0);
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 1;
+            }
+
+            70% {
+                opacity: 1;
+            }
+
+            100% {
+                transform: translateY(-80vh);
+                opacity: 1;
+            }
+        }
+
+
+        .bubble img:nth-child(1) {
+            animation-delay: 2s;
+            width: 30px;
+        }
+
+        .bubble img:nth-child(2) {
+            animation-delay: 1s;
+        }
+
+        .bubble img:nth-child(3) {
+            animation-delay: 3s;
+            width: 30px;
+        }
+
+        .bubble img:nth-child(4) {
+            animation-delay: 4.5s;
+        }
+
+        .bubble img:nth-child(5) {
+            animation-delay: 3s;
+        }
+
+        .bubble img:nth-child(6) {
+            animation-delay: 6s;
+            width: 40px;
+        }
+
+        .bubble img:nth-child(7) {
+            animation-delay: 7s;
+            width: 30px;
+        }
+
+        .link {
+            background-color: red;
+            position: absolute;
+            width: 21.9rem;
+            height: 3rem;
+            text-align: center;
+            border: 2px solid black;
+            right: 36.5rem;
+            top: 29.5rem;
+        }
+
+        .login-btn {
+            background: none;
+            border: none;
+            color: blue;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: inherit;
+            padding: 0;
+        }
+        #notificationSound {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    
+
+    <audio id="notificationSound">
+        <source src="keyboard2.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
+    <div class="bubble">
+        <img src="bubble.png">
+        <img src="bubble.png">
+        <img src="bubble.png">
+        <img src="bubble.png">
+        <img src="bubble.png">
+        <img src="bubble.png">
+        <img src="bubble.png">
+    </div>
+    <div class="bgimage">
+        <img src="avatar.png">
+    </div>
+    <div class="login-form">
+        <h1>WELCOME</h1>
+        <div class="logo"><img src="images/logo.png" alt=""></div>
+
+        <form id="loginForm">
+            <div class="textbox">
+                <input type="text" id="username" placeholder="Username" required>
+                <span class="check-message hidden">Required</span>
+            </div>
+
+            <div class="textbox">
+                <input type="number" id="age" placeholder="Age" required min="9">
+                <span class="check-message hidden">Required</span>
+            </div>
+
+            <div class="options">
+                <label class="remember-me">
+                    <span class="checkbox">
+                        <input type="checkbox" required>
+                        <span class="checked"></span>
+                    </span>
+                    <a href="termsandcondition.html">Terms and Conditions</a>
+                </label>
+            </div>
+
+            <input type="submit" class="login-btn active" value="Play Now">
+        </form>
+    </div>
+
+   <script>
+    var timeout;
+
+    function storeUserDetails(username, age) {
+        var users = JSON.parse(localStorage.getItem('users')) || [];
+
+        users.push({ username: username, age: age });
+
+        localStorage.setItem('users', JSON.stringify(users));
+    }
+    document.getElementById("loginForm").addEventListener("submit", function(event) {
+        event.preventDefault();
+
+        var username = document.getElementById('username').value;
+        var age = document.getElementById('age').value;
+
+        if (username.trim() !== '' && age.trim() !== '') {
+            storeUserDetails(username, age);
+            window.location.href = 'bob1.html';
+        } else {
+            alert('Please fill out all required fields.');
+        }
+    });
+
+
+    function playNotificationSound() {
+        var audio = document.getElementById("notificationSound");
+        audio.play();
+    }
+    
+
+    document.getElementById("username").addEventListener("input", function() {
+        clearTimeout(timeout);
+        timeout = setTimeout(playNotificationSound, 100); // Adjust delay as needed
+    });
+
+    document.getElementById("age").addEventListener("input", function() {
+        clearTimeout(timeout);
+        timeout = setTimeout(playNotificationSound, 100); // Adjust delay as needed
+    });
+
+    document.querySelector('input[type="checkbox"]').addEventListener("change", function() {
+        if (this.checked) {
+            playNotificationSound();
+        }
+    });
+
+    document.getElementById("playButton").addEventListener("click", function() {
+        playNotificationSound();
+    });
+    
+</script>
+
+    
+    
+</body>
+
+
+</html>

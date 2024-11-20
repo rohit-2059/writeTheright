@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rights Match-Up Game</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+
+        #game-container {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            user-select: none;
+        }
+
+        .card {
+            width: 160px;
+            height: 170px;
+            position: relative;
+            perspective: 1000px;
+            transform-style: preserve-3d;
+            transition: transform 0.5s;
+            cursor: pointer;
+            box-shadow: 10px 10px 16px rgba(138, 179, 212, 0.2);
+            border-radius: 2rem;
+        }
+
+        .card .card-inner {
+            width: 100%;
+            height: 100%;
+            transform-style: preserve-3d;
+            transition: transform 0.5s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .card.flipped .card-inner {
+            transform: rotateY(180deg);
+        }
+
+        .card .card-face {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: absolute;
+            backface-visibility: hidden;
+            font-size: 16px;
+            color: white;
+            margin-left: 8px;
+        }
+
+        .card .card-face.front {
+            background-color: #3498db;
+        }
+
+        .card .card-face.back {
+            background-color: #e74c3c;
+            transform: rotateY(180deg);
+        }
+
+        #win-screen {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        #win-message {
+            font-size: 24px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        #next-level-btn {
+            padding: 10px 20px;
+            font-size: 18px;
+            cursor: pointer;
+        }
+
+        body h1 {
+            position: absolute;
+            text-align: center;
+            margin-top: -35rem;
+            font-size: 3rem;
+            user-select: none;
+        }
+
+        body {
+            background-image: url(ChocolateNadi.jpg);
+            background-repeat: no-repeat;
+            background-size: cover;
+        }
+    </style>
+</head>
+
+<body>
+    <audio id="flip-sound">
+        <source src="card flip.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="next-level-sound">
+        <source src="nextlevel.mp3" type="audio/mpeg">
+    </audio>
+    <h1>Match-Up Rights</h1>
+    <div id="game-container"></div>
+    <div id="win-screen">
+        <div id="win-message">Congratulations! You Won!</div>
+        <a href="display3.html"><button id="next-level-btn" onclick="nextLevel()">Next Level</button></a>
+    </div>
+
+    <script>
+        const rights = ['Freedom of Speech', 'Right to Education', 'Right to Play', 'Right to Health', 'Right to Safety', 'Right to Family'];
+
+        const cards = [...rights, ...rights];
+
+        // Shuffle cards using Fisher-Yates algorithm
+        for (let i = cards.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [cards[i], cards[j]] = [cards[j], cards[i]];
+        }
+
+        const gameContainer = document.getElementById('game-container');
+        const winScreen = document.getElementById('win-screen');
+        const flipSound = document.getElementById('flip-sound');
+        const nextLevelSound = document.getElementById('next-level-sound');
+
+        cards.forEach((right, index) => {
+            const cardElement = document.createElement('div');
+            cardElement.classList.add('card');
+            cardElement.dataset.index = index;
+            cardElement.innerHTML = `
+            <div class="card-inner">
+                <div class="card-face front" onclick="revealCard(${index})">${'?'}</div>
+                <div class="card-face back">${cards[index]}</div>
+            </div>
+        `;
+            gameContainer.appendChild(cardElement);
+        });
+
+        let flippedCards = [];
+        let flippedIndexes = [];
+        let matchedPairs = 0;
+        let isGameComplete = false;
+
+        function revealCard(index) {
+            if (isGameComplete) {
+                return;
+            }
+
+            const card = gameContainer.querySelector(`.card[data-index="${index}"]`);
+
+            if (!card.classList.contains('flipped') && flippedCards.length < 2) {
+                card.classList.add('flipped');
+                flipSound.play(); // Play flip sound
+                flippedCards.push(cards[index]);
+                flippedIndexes.push(index);
+
+                if (flippedCards.length === 2) {
+                    setTimeout(checkMatch, 1000);
+                }
+            }
+        }
+
+        function checkMatch() {
+            const [index1, index2] = flippedIndexes;
+            const card1 = gameContainer.querySelector(`.card[data-index="${index1}"]`);
+            const card2 = gameContainer.querySelector(`.card[data-index="${index2}"]`);
+
+            if (flippedCards[0] === flippedCards[1]) {
+                card1.removeEventListener('click', () => revealCard(index1));
+                card2.removeEventListener('click', () => revealCard(index2));
+                matchedPairs++;
+
+                if (matchedPairs === rights.length) {
+                    showWinScreen();
+                }
+            } else {
+                setTimeout(() => {
+                    card1.classList.remove('flipped');
+                    card2.classList.remove('flipped');
+                }, 500);
+            }
+
+            flippedCards = [];
+            flippedIndexes = [];
+        }
+
+        function showWinScreen() {
+            isGameComplete = true;
+            winScreen.style.display = 'flex';
+        }
+
+        function nextLevel() {
+            isGameComplete = false;
+            winScreen.style.display = 'none';
+            matchedPairs = 0;
+            nextLevelSound.play();
+
+            for (let i = cards.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [cards[i], cards[j]] = [cards[j], cards[i]];
+            }
+
+            const cardElements = document.querySelectorAll('.card');
+            cardElements.forEach((card) => {
+                card.classList.remove('flipped');
+            });
+        }
+    </script>
+
+</body>
+
+</html>
